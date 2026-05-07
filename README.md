@@ -1,25 +1,26 @@
-# pi-telegram-sebas
+# π Telegram Extension
+
+Use Telegram as a bridge into your live π session. Pair one Telegram user, then chat with π from Telegram while preserving the same session state, tools, queue, and session metadata already running locally.
+
+![Telegram Bridge screenshot](./assets/telegram-bridge.png)
 
 This repository is a fork of [`llblab/pi-telegram`](https://github.com/llblab/pi-telegram).
 
-## Fork scope
+For the original project overview, installation, configuration, and full feature documentation, see the upstream README:
+- https://github.com/llblab/pi-telegram
 
-This fork exists to maintain a native Telegram `/new` command for starting a fresh Pi session from Telegram.
+## Start Here
 
-## Differences from upstream
+This fork adds a native Telegram `/new` command.
 
-Compared with upstream, this fork currently adds:
+### `/new`
 
-- a native Telegram `/new` command
-- `/new` in the bot command list and bridge help text
-- bridge-level interception for `/new`, so it is not forwarded as normal model text
-- a runtime-compatible implementation that triggers the core Pi `/new` command internally via `sendUserMessage("/new", { deliverAs: "followUp" })`
+Use `/new` inside the Telegram DM with your bot to start a fresh Pi session.
 
-## Status
+Differences from upstream:
+- adds `/new` as a reserved Telegram command
+- includes `/new` in bot commands and bridge help
+- intercepts `/new` at the bridge layer so it is not sent as normal model text
+- triggers the core Pi `/new` command internally in a way compatible with the Telegram polling runtime
 
 Tested end-to-end from Telegram on `ballbox-first`.
-
-## Upstream
-
-Upstream repository:
-- https://github.com/llblab/pi-telegram
