@@ -2,7 +2,7 @@
 
 Use Telegram as a bridge into your live π session. Pair one Telegram user, then chat with π from Telegram while preserving the same session state, tools, queue, and session metadata already running locally.
 
-![Telegram Bridge screenshot](./assets/telegram-bridge.png)
+![Telegram Bridge screenshot](https://raw.githubusercontent.com/llblab/pi-telegram/main/assets/telegram-bridge.png)
 
 This repository is a fork of [`llblab/pi-telegram`](https://github.com/llblab/pi-telegram).
 
