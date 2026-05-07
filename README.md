@@ -85,6 +85,7 @@ Use these inside the Telegram DM with your bot:
 
 - **`/start`**: Pair the first Telegram user when needed, register bridge bot commands, and open the inline application menu with command help, available π prompt templates, status rows, and controls.
 - **`/compact`**: Start session compaction (only works when the session is idle).
+- **`/new`**: Start a fresh clean π session from Telegram.
 - **`/next`**: Dispatch the next queued turn (aborts π first if busy).
 - **`/continue`**: Enqueue a priority `continue` prompt. It waits like normal Telegram work when π is busy and can trigger prompt/skill handling that listens for `continue`.
 - **`/stop`**: Abort the active run and clear all waiting Telegram queue items.
@@ -94,7 +95,7 @@ Prompt-template commands: π prompt templates are mapped to Telegram-safe aliase
 
 Hidden compatibility shortcuts: `/help` and `/status` open the same main application menu, `/model` opens the model section, `/thinking` opens the thinking section, `/queue` opens the queue section, and `/settings` opens hidden bridge settings. Settings rows open detail submenus with Back plus green/black/yellow option controls such as On and Off for checkboxes. These shortcuts are intentionally not shown in the bot command menu.
 
-Telegram command admission is explicit: `/compact`, `/queue`, `/settings`, `/stop`, `/abort`, `/next`, `/help`, `/start`, `/status`, `/model`, and `/thinking` execute immediately. `/continue` is a command shortcut that enqueues a priority Telegram prompt containing `continue`. Prompt-template commands expand before queueing and then follow normal prompt-queue rules. Synthetic model-switch continuation turns still enter the high-priority control lane so they can resume before normal queued prompts when π becomes safe to dispatch.
+Telegram command admission is explicit: `/compact`, `/new`, `/queue`, `/settings`, `/stop`, `/abort`, `/next`, `/help`, `/start`, `/status`, `/model`, and `/thinking` execute immediately. `/continue` is a command shortcut that enqueues a priority Telegram prompt containing `continue`. Prompt-template commands expand before queueing and then follow normal prompt-queue rules. Synthetic model-switch continuation turns still enter the high-priority control lane so they can resume before normal queued prompts when π becomes safe to dispatch.
 
 ### Pi Commands
 

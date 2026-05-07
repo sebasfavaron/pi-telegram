@@ -33,6 +33,7 @@ export const TELEGRAM_COMMAND_EMOJI = {
   model: "🤖",
   thinking: "🧠",
   compact: "🗜",
+  new: "🆕",
   queue: "🔢",
   next: "⏩",
   continue: "▶️",
@@ -75,6 +76,13 @@ export const TELEGRAM_BUILTIN_BOT_COMMANDS: readonly TelegramBotCommandDefinitio
       description: formatTelegramBotCommandDescription(
         "compact",
         "Compact current session",
+      ),
+    },
+    {
+      command: "new",
+      description: formatTelegramBotCommandDescription(
+        "new",
+        "Start new clean session",
       ),
     },
     {
@@ -264,6 +272,7 @@ export const TELEGRAM_RESERVED_COMMAND_NAMES = [
   "status",
   "queue",
   "compact",
+  "new",
   "model",
   "thinking",
   "settings",
@@ -295,6 +304,7 @@ export type TelegramCommandAction =
   | { kind: "continue"; executionMode: "immediate" }
   | { kind: "queue"; executionMode: "immediate" }
   | { kind: "compact"; executionMode: "immediate" }
+  | { kind: "new"; executionMode: "immediate" }
   | { kind: "status"; executionMode: "immediate" }
   | { kind: "model"; executionMode: "immediate" }
   | { kind: "thinking"; executionMode: "immediate" }
@@ -314,6 +324,7 @@ export interface TelegramCommandActionDeps<TMessage, TContext> {
   handleContinue: (message: TMessage, ctx: TContext) => Promise<void>;
   handleQueue: (message: TMessage, ctx: TContext) => Promise<void>;
   handleCompact: (message: TMessage, ctx: TContext) => Promise<void>;
+  handleNew: (message: TMessage, ctx: TContext) => Promise<void>;
   handleStatus: (message: TMessage, ctx: TContext) => Promise<void>;
   handleModel: (message: TMessage, ctx: TContext) => Promise<void>;
   handleThinking: (message: TMessage, ctx: TContext) => Promise<void>;
@@ -340,6 +351,10 @@ export interface TelegramRuntimeEventRecorderPort {
     category: string,
     error: unknown,
     details?: Record<string, unknown>,
+  ) => void;
+  sendUserMessage?: (
+    message: string,
+    options?: { deliverAs?: "steer" | "followUp" },
   ) => void;
 }
 
@@ -606,6 +621,10 @@ export interface TelegramCommandRuntimeDeps<
   getPromptTemplateCommands?: () => readonly TelegramPromptTemplateMenuCommand[];
   persistConfig: () => Promise<void>;
   sendTextReply: (message: TMessage, text: string) => Promise<void>;
+  sendUserMessage?: (
+    message: string,
+    options?: { deliverAs?: "steer" | "followUp" },
+  ) => void;
 }
 
 export const TELEGRAM_APP_MENU_INTRO_HTML = [
@@ -613,6 +632,7 @@ export const TELEGRAM_APP_MENU_INTRO_HTML = [
   "",
   `${formatTelegramCommandEmojiPrefix("start")}/start — Open menu / Pair bridge`,
   `${formatTelegramCommandEmojiPrefix("compact")}/compact — Compact current session`,
+  `${formatTelegramCommandEmojiPrefix("new")}/new — Start new clean session`,
   `${formatTelegramCommandEmojiPrefix("next")}/next — Force next turn`,
   `${formatTelegramCommandEmojiPrefix("continue")}/continue — Queue continue prompt`,
   `${formatTelegramCommandEmojiPrefix("abort")}/abort — Abort π`,
@@ -681,6 +701,7 @@ export const TELEGRAM_COMMAND_ACTIONS = {
   status: { kind: "status", executionMode: "immediate" },
   queue: { kind: "queue", executionMode: "immediate" },
   compact: { kind: "compact", executionMode: "immediate" },
+  new: { kind: "new", executionMode: "immediate" },
   model: { kind: "model", executionMode: "immediate" },
   thinking: { kind: "thinking", executionMode: "immediate" },
   settings: { kind: "settings", executionMode: "immediate" },
@@ -840,6 +861,14 @@ export async function handleTelegramCompactCommand(
   await deps.sendTextReply("Compaction started.");
 }
 
+export async function handleTelegramNewCommand(deps: {
+  sendTextReply: (text: string) => Promise<void>;
+  sendUserMessage: (message: string, options?: { deliverAs?: "steer" | "followUp" }) => void;
+}): Promise<void> {
+  await deps.sendTextReply("Creating new session…");
+  deps.sendUserMessage("/new", { deliverAs: "followUp" });
+}
+
 export async function handleTelegramStatusCommand<TContext>(deps: {
   ctx: TContext;
   showStatus: (ctx: TContext) => Promise<void>;
@@ -880,6 +909,9 @@ export async function executeTelegramCommandAction<TMessage, TContext>(
       return true;
     case "compact":
       await deps.handleCompact(message, ctx);
+      return true;
+    case "new":
+      await deps.handleNew(message, ctx);
       return true;
     case "status":
       await deps.handleStatus(message, ctx);
@@ -975,6 +1007,7 @@ export function createTelegramCommandHandlerTargetRuntime<
     }),
     persistConfig: deps.persistConfig,
     sendTextReply: commandTargetRuntime.sendTextReply,
+    sendUserMessage: deps.sendUserMessage,
     recordRuntimeEvent: deps.recordRuntimeEvent,
   });
 }
@@ -1108,6 +1141,18 @@ async function handleTelegramCommandRuntime<
           compact: (callbacks) => deps.compact(commandCtx, callbacks),
           sendTextReply: sendReplyFor(nextMessage),
           recordRuntimeEvent: deps.recordRuntimeEvent,
+        });
+      },
+      handleNew: async (nextMessage, _commandCtx) => {
+        if (!deps.sendUserMessage) {
+          await sendReplyFor(nextMessage)(
+            "New session not available in this runtime.",
+          );
+          return;
+        }
+        await handleTelegramNewCommand({
+          sendTextReply: sendReplyFor(nextMessage),
+          sendUserMessage: deps.sendUserMessage,
         });
       },
       handleStatus: async (nextMessage, commandCtx) => {

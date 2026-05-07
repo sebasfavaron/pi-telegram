@@ -311,6 +311,7 @@ export function createTelegramInboundRouteRuntime<
     getPromptTemplateCommands,
     persistConfig: deps.configStore.persist,
     sendTextReply: deps.sendTextReply,
+    sendUserMessage: deps.sendUserMessage,
     recordRuntimeEvent: deps.recordRuntimeEvent,
   });
   const promptEnqueue = Queue.createTelegramPromptEnqueueController<

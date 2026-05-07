@@ -89,6 +89,7 @@ test("Command helpers expose Telegram bot command definitions", () => {
       description: "🟢 Open menu / Pair bridge",
     },
     { command: "compact", description: "🗜 Compact current session" },
+    { command: "new", description: "🆕 Start new clean session" },
     {
       command: "next",
       description: "⏩ Force next turn",
@@ -1012,6 +1013,9 @@ test("Command helpers execute command actions through provided handlers", async 
     },
     handleQueue: async () => {
       events.push("queue");
+    },
+    handleNew: async () => {
+      events.push("new");
     },
   };
   assert.equal(
