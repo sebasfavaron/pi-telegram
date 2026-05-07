@@ -1,15 +1,25 @@
 # pi-telegram-sebas
 
-Fork de `llblab/pi-telegram`:
-- upstream: https://github.com/llblab/pi-telegram
+This repository is a fork of [`llblab/pi-telegram`](https://github.com/llblab/pi-telegram).
 
-## Diferencias en este fork
+## Fork scope
 
-- agrega comando nativo de Telegram `/new`
-- `/new` aparece en bot commands y ayuda del bridge
-- `/new` se intercepta en el bridge, no se manda como texto normal al modelo
-- implementación adaptada al runtime real del polling de Telegram: dispara el core `/new` internamente vía `sendUserMessage("/new", { deliverAs: "followUp" })`
+This fork exists to maintain a native Telegram `/new` command for starting a fresh Pi session from Telegram.
 
-## Estado
+## Differences from upstream
 
-Probado end-to-end desde Telegram en `ballbox-first`.
+Compared with upstream, this fork currently adds:
+
+- a native Telegram `/new` command
+- `/new` in the bot command list and bridge help text
+- bridge-level interception for `/new`, so it is not forwarded as normal model text
+- a runtime-compatible implementation that triggers the core Pi `/new` command internally via `sendUserMessage("/new", { deliverAs: "followUp" })`
+
+## Status
+
+Tested end-to-end from Telegram on `ballbox-first`.
+
+## Upstream
+
+Upstream repository:
+- https://github.com/llblab/pi-telegram
